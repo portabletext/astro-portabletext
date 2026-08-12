@@ -1,0 +1,27 @@
+---
+import type {MarkProps} from '@portabletext/astro/types'
+
+export type Props = MarkProps<{pitch?: number}>
+
+const {node} = Astro.props
+const pitch = node.markDef?.pitch ?? 1
+---
+
+<button type="button" class="speech-synthesis" data-pitch={pitch}><slot /></button>
+
+<script>
+  const supported = 'speechSynthesis' in window
+
+  for (const el of document.querySelectorAll<HTMLButtonElement>('.speech-synthesis')) {
+    if (!supported) {
+      el.disabled = true
+      continue
+    }
+
+    el.addEventListener('click', () => {
+      const utterance = new SpeechSynthesisUtterance(el.textContent ?? '')
+      utterance.pitch = Number(el.dataset.pitch) || 1
+      window.speechSynthesis.speak(utterance)
+    })
+  }
+</script>

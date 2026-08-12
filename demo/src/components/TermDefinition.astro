@@ -1,0 +1,13 @@
+---
+import type {MarkProps} from '@portabletext/astro/types'
+
+export type Props = MarkProps<{details?: string}>
+
+const {node} = Astro.props
+const details = node.markDef?.details
+---
+
+<span class="term-definition" tabindex="0">
+  <slot />
+  <span class="term-tooltip" role="tooltip">{details}</span>
+</span>

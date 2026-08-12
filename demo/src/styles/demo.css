@@ -1,0 +1,130 @@
+body {
+  font-family: sans-serif;
+}
+
+#demo-root {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+code {
+  background: #eee;
+}
+
+blockquote {
+  border-left: 3px solid #ccc;
+  margin-left: 0.6rem;
+  padding-left: 0.6rem;
+}
+
+.slug-anchor {
+  opacity: 0;
+  text-decoration: none;
+  color: #888;
+  display: inline-block;
+  padding: 5px 10px;
+}
+
+.slug-anchor:hover {
+  background: #eee;
+}
+
+h2:hover .slug-anchor {
+  opacity: 1;
+}
+
+li {
+  margin: 5px;
+}
+
+.currency-amount {
+  white-space: nowrap;
+}
+
+.speech-synthesis {
+  font: inherit;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+
+.speech-synthesis:disabled {
+  cursor: default;
+  text-decoration: none;
+}
+
+/* Tooltip-style annotations, replacing the React demo's Sanity UI popovers */
+.term-definition,
+.character-reference {
+  position: relative;
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+.term-tooltip,
+.character-card {
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  z-index: 10;
+  width: max-content;
+  max-width: 260px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  text-align: left;
+  white-space: normal;
+}
+
+.term-definition:hover .term-tooltip,
+.term-definition:focus .term-tooltip,
+.character-reference:hover .character-card,
+.character-reference:focus .character-card {
+  display: block;
+}
+
+.character-card {
+  display: none;
+}
+
+.character-reference:hover .character-card,
+.character-reference:focus .character-card {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.character-avatar {
+  font-size: 1.75rem;
+}
+
+.character-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.annotated-map {
+  min-height: 400px;
+  border: 1px solid transparent;
+}
+
+.annotated-map .annotated-map-loading {
+  border: 1px solid #000;
+  background: #eee;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}

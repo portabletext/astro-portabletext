@@ -1,0 +1,43 @@
+---
+import type {MarkProps} from '@portabletext/astro/types'
+
+export type Props = MarkProps<{characterId?: string}>
+
+interface Character {
+  name: string
+  emoji: string
+  description: string
+}
+
+const characters: Record<string, Character> = {
+  nedStark: {
+    name: 'Eddard "Ned" Stark',
+    emoji: '🐺',
+    description:
+      'The head of House Stark, the Lord of Winterfell, Lord Paramount and Warden of the North.',
+  },
+}
+
+const {node} = Astro.props
+const id = node.markDef?.characterId ?? ''
+const data = characters[id]
+---
+
+{
+  data ? (
+    <span class="character-reference" tabindex="0">
+      <slot />
+      <span class="character-card" role="tooltip">
+        <span class="character-avatar" aria-hidden="true">
+          {data.emoji}
+        </span>
+        <span class="character-body">
+          <strong>{data.name}</strong>
+          <span>{data.description}</span>
+        </span>
+      </span>
+    </span>
+  ) : (
+    <slot />
+  )
+}

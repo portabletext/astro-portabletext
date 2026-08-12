@@ -1,0 +1,13 @@
+---
+import {Code as ShikiCode} from 'astro:components'
+
+import type {Props as $} from '@portabletext/astro/types'
+
+import type {CodeBlock} from '../types'
+
+type Props = $<CodeBlock>
+
+const {node} = Astro.props
+---
+
+<ShikiCode code={node.code} lang={node.language ?? 'js'} />

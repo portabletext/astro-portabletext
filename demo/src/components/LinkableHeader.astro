@@ -1,0 +1,22 @@
+---
+import {toPlainText} from '@portabletext/astro'
+import type {BlockProps} from '@portabletext/astro/types'
+
+export type Props = BlockProps
+
+const {node} = Astro.props
+
+/**
+ * Intentionally simplistic - a real implementation would use a proper slugifier.
+ */
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+}
+
+const slug = slugify(toPlainText(node))
+---
+
+<h2 id={slug}>
+  <slot />{' '}
+  <a class="slug-anchor" href={`#${slug}`}>#</a>
+</h2>

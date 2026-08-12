@@ -1,0 +1,14 @@
+---
+import { PortableText } from "@portabletext/astro";
+import Layout from "../../layouts/Default.astro";
+
+const blocks = [
+  {
+    _type: "helloWorld",
+  },
+];
+---
+
+<Layout>
+  <PortableText value={blocks} />
+</Layout>

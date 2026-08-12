@@ -1,0 +1,18 @@
+---
+import '../styles/demo.css'
+
+const packageName = '@portabletext/astro'
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{packageName} demo</title>
+  </head>
+  <body>
+    <main id="demo-root">
+      <slot />
+    </main>
+  </body>
+</html>
