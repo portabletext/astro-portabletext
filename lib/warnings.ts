@@ -1,22 +1,18 @@
-import type { NodeType } from "./types";
+import type {NodeType} from './types'
 
 const getTemplate = (prop: string, type: string): string =>
-  `PortableText [components.${prop}] is missing "${type}"`;
+  `PortableText [components.${prop}] is missing "${type}"`
 
-export const unknownTypeWarning = (type: string): string =>
-  getTemplate("type", type);
+export const unknownTypeWarning = (type: string): string => getTemplate('type', type)
 
-export const unknownMarkWarning = (markType: string): string =>
-  getTemplate("mark", markType);
+export const unknownMarkWarning = (markType: string): string => getTemplate('mark', markType)
 
-export const unknownBlockWarning = (style: string): string =>
-  getTemplate("block", style);
+export const unknownBlockWarning = (style: string): string => getTemplate('block', style)
 
-export const unknownListWarning = (listItem: string): string =>
-  getTemplate("list", listItem);
+export const unknownListWarning = (listItem: string): string => getTemplate('list', listItem)
 
 export const unknownListItemWarning = (listStyle: string): string =>
-  getTemplate("listItem", listStyle);
+  getTemplate('listItem', listStyle)
 
 export const getWarningMessage = (nodeType: NodeType, type: string) => {
   const fncs = {
@@ -25,11 +21,12 @@ export const getWarningMessage = (nodeType: NodeType, type: string) => {
     listItem: unknownListItemWarning,
     mark: unknownMarkWarning,
     type: unknownTypeWarning,
-  };
+  }
 
-  return fncs[nodeType](type);
-};
+  return fncs[nodeType](type)
+}
 
 export function printWarning(message: string): void {
-  console.warn(message);
+  // oxlint-disable-next-line no-console
+  console.warn(message)
 }

@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "description": "Render Portable Text with Astro",
   "keywords": [
-    "portable-text",
     "astro",
-    "withastro",
     "astro-component",
-    "sanity"
+    "portable-text",
+    "sanity",
+    "withastro"
   ],
   "homepage": "https://github.com/portabletext/astro-portabletext#readme",
   "bugs": {
@@ -28,6 +28,13 @@
     "lib"
   ],
   "type": "module",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "lib/*"
+      ]
+    }
+  },
   "exports": {
     ".": "./lib/index.ts",
     "./components": "./lib/components.ts",
@@ -38,13 +45,6 @@
       "default": "./lib/utils.ts"
     },
     "./package.json": "./package.json"
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "lib/*"
-      ]
-    }
   },
   "scripts": {
     "prebuild:demo": "pnpm clean",
@@ -68,8 +68,8 @@
     "@changesets/cli": "^2.31.1",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^26.2.0",
-    "cheerio": "^1.2.0",
     "astro": "^7.2.1",
+    "cheerio": "^1.2.0",
     "leaflet": "^1.9.4",
     "oxfmt": "^0.63.0",
     "oxlint": "^1.78.0",
@@ -89,5 +89,11 @@
   "engines": {
     "node": ">=22.12"
   },
-  "packageManager": "pnpm@10.33.3"
+  "packageManager": "pnpm@10.33.3",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  }
 }

@@ -223,12 +223,7 @@ const portableText = [
 ## Utility functions
 
 ```js
-import {
-  usePortableText,
-  mergeComponents,
-  toPlainText,
-  spanToPlainText,
-} from '@portabletext/astro'
+import {usePortableText, mergeComponents, toPlainText, spanToPlainText} from '@portabletext/astro'
 ```
 
 ### `usePortableText`

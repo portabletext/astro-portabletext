@@ -1,7 +1,8 @@
-import type { TypedObject } from "@portabletext/types";
-import type { Context } from "./types";
+import type {TypedObject} from '@portabletext/types'
 
-export const key = Symbol("@portabletext/astro");
+import type {Context} from './types'
+
+export const key = Symbol('@portabletext/astro')
 
 /**
  * This function returns rendering utility functions within a Portable Text tree. It should
@@ -13,9 +14,8 @@ export const key = Symbol("@portabletext/astro");
  */
 export function usePortableText(node: TypedObject) {
   if (!(key in globalThis)) {
-    throw new Error(`PortableText "context" has not been initialised`);
+    throw new Error(`PortableText "context" has not been initialised`)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (globalThis as any)[key](node) as Context;
+  return (globalThis as any)[key](node) as Context
 }

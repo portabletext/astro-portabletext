@@ -1,23 +1,18 @@
-import type {
-  Component,
-  ComponentOrRecord,
-  SomePortableTextComponents,
-  TypedObject,
-} from "./types";
+import type {Component, ComponentOrRecord, SomePortableTextComponents, TypedObject} from './types'
 
 /**
  * Helper for component to throw an error
  * @param err
  */
 export function throwError(err: Error | string): never {
-  throw err;
+  throw err
 }
 
 /**
  * Returns true if `it` is component
  */
 export function isComponent(it: unknown): it is Component {
-  return typeof it === "function";
+  return typeof it === 'function'
 }
 
 /**
@@ -30,7 +25,6 @@ export function isComponent(it: unknown): it is Component {
  *
  * @typeParam Components - The type of the base components object.
  * @typeParam Overrides - The type of the overrides components object.
- * @typeParam MergedComponents - The type of the resulting merged components object.
  *
  * @param components - The base components object.
  * @param overrides - The overrides components object.
@@ -40,36 +34,32 @@ export function isComponent(it: unknown): it is Component {
 export function mergeComponents<
   Components extends SomePortableTextComponents,
   Overrides extends SomePortableTextComponents,
-  MergedComponents = {
-    [Key in keyof (Components & Overrides)]: Key extends keyof (
-      | Overrides
-      | Components
-    )
-      ? Overrides[Key] extends Component
-        ? Overrides[Key]
-        : Components[Key] extends Component
-          ? Overrides[Key]
-          : (Overrides & Components)[Key]
-      : (Overrides & Components)[Key];
-  },
 >(components: Components, overrides: Overrides) {
-  const cmps = { ...components } as Record<string, ComponentOrRecord>;
+  const cmps = {...components} as Record<string, ComponentOrRecord>
 
   for (const [key, override] of Object.entries(overrides)) {
-    const current = components[key as keyof typeof components];
+    const current = components[key as keyof typeof components]
 
     const value =
       !current || isComponent(override) || isComponent(current)
         ? override
         : {
-            ...current,
-            ...override,
-          };
+            ...(current as Record<string, Component>),
+            ...(override as Record<string, Component>),
+          }
 
-    cmps[key] = value;
+    cmps[key] = value
   }
 
-  return cmps as MergedComponents;
+  return cmps as {
+    [Key in keyof (Components & Overrides)]: Key extends keyof (Overrides | Components)
+      ? Overrides[Key] extends Component
+        ? Overrides[Key]
+        : Components[Key] extends Component
+          ? Overrides[Key]
+          : (Overrides & Components)[Key]
+      : (Overrides & Components)[Key]
+  }
 }
 
 /**
@@ -79,11 +69,11 @@ export function mergeComponents<
  */
 
 type ResolvedComponents = {
-  Default: Component;
-  Unknown: Component;
-};
+  Default: Component
+  Unknown: Component
+}
 
-const nodeComponentsMap = new WeakMap<TypedObject, ResolvedComponents>();
+const nodeComponentsMap = new WeakMap<TypedObject, ResolvedComponents>()
 
 /**
  * Binds the resolved components to a specific node object.
@@ -97,12 +87,8 @@ const nodeComponentsMap = new WeakMap<TypedObject, ResolvedComponents>();
  * @param Default - The resolved default component for this node.
  * @param Unknown - The resolved fallback (unknown) component for this node.
  */
-export function setNodeComponents(
-  node: TypedObject,
-  Default: Component,
-  Unknown: Component
-): void {
-  nodeComponentsMap.set(node, { Default, Unknown });
+export function setNodeComponents(node: TypedObject, Default: Component, Unknown: Component): void {
+  nodeComponentsMap.set(node, {Default, Unknown})
 }
 
 /**
@@ -112,8 +98,6 @@ export function setNodeComponents(
  * @param node - The node object to look up (by reference).
  * @returns The component pair, or `undefined` if this exact node object was not registered.
  */
-export function getNodeComponents(
-  node: TypedObject
-): ResolvedComponents | undefined {
-  return nodeComponentsMap.get(node);
+export function getNodeComponents(node: TypedObject): ResolvedComponents | undefined {
+  return nodeComponentsMap.get(node)
 }
