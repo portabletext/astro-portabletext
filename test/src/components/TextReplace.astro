@@ -1,0 +1,12 @@
+---
+import type { TextNode, Props as $ } from "@portabletext/astro/types";
+
+export type Props = $<TextNode>;
+
+const { node } = Astro.props;
+const replacedText = node.text
+  .replace("programmer", "JavaScript developer")
+  .replace("arrays", "callbacks");
+---
+
+{replacedText}

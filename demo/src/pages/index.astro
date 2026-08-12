@@ -1,0 +1,49 @@
+---
+import {PortableText} from '@portabletext/astro'
+import {ListItem} from '@portabletext/astro/components'
+import type {SomePortableTextComponents} from '@portabletext/astro/types'
+
+import AnnotatedMap from '../components/AnnotatedMap.astro'
+import CharacterReference from '../components/CharacterReference.astro'
+import Code from '../components/Code.astro'
+import CurrencyAmount from '../components/CurrencyAmount.astro'
+import Link from '../components/Link.astro'
+import LinkableHeader from '../components/LinkableHeader.astro'
+import SchnauzerList from '../components/SchnauzerList.astro'
+import SpeechSynthesis from '../components/SpeechSynthesis.astro'
+import TermDefinition from '../components/TermDefinition.astro'
+import {blocks} from '../fixture'
+import Layout from '../layouts/Default.astro'
+
+/**
+ * Statically defined component map, mirroring the `@portabletext/react` demo.
+ * `type` handles custom object types, `block` overrides a block style, `list`
+ * handles a custom list type and `mark` overrides/adds annotations.
+ */
+const components: SomePortableTextComponents = {
+  type: {
+    code: Code,
+    currencyAmount: CurrencyAmount,
+    annotatedMap: AnnotatedMap,
+  },
+  block: {
+    h2: LinkableHeader,
+  },
+  list: {
+    schnauzer: SchnauzerList,
+  },
+  listItem: {
+    schnauzer: ListItem,
+  },
+  mark: {
+    link: Link,
+    characterReference: CharacterReference,
+    speech: SpeechSynthesis,
+    definition: TermDefinition,
+  },
+}
+---
+
+<Layout>
+  <PortableText value={blocks} components={components} />
+</Layout>

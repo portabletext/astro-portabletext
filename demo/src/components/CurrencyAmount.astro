@@ -1,0 +1,52 @@
+---
+import type {Props as $} from '@portabletext/astro/types'
+
+import type {CurrencyAmountBlock} from '../types'
+
+type Props = $<CurrencyAmountBlock>
+
+const {node} = Astro.props
+---
+
+<span class="currency-amount" data-amount={node.amount} data-currency={node.currency}>
+  {node.amount} {node.currency}
+</span>
+
+<script>
+  interface Snapshot {
+    flag: string
+    currency: string
+    rate: number
+  }
+
+  // Just a snapshot in time, don't use this for anything real.
+  const snapshot: Record<string, Snapshot> = {
+    US: {flag: '🇺🇸', currency: 'USD', rate: 1},
+    GB: {flag: '🇬🇧', currency: 'GBP', rate: 0.79},
+    EU: {flag: '🇪🇺', currency: 'EUR', rate: 0.92},
+    NO: {flag: '🇳🇴', currency: 'NOK', rate: 10.7},
+    JP: {flag: '🇯🇵', currency: 'JPY', rate: 156.4},
+    IN: {flag: '🇮🇳', currency: 'INR', rate: 83.3},
+    AU: {flag: '🇦🇺', currency: 'AUD', rate: 1.52},
+    CA: {flag: '🇨🇦', currency: 'CAD', rate: 1.37},
+  }
+
+  const languages = Array.isArray(navigator.languages) ? navigator.languages : ['en-US']
+  const region = languages
+    .map((code) => code.split('-')[1]?.toUpperCase())
+    .find((code) => code && code in snapshot)
+  const target = region ? snapshot[region] : undefined
+
+  if (target) {
+    for (const el of document.querySelectorAll<HTMLElement>('.currency-amount')) {
+      const amount = Number(el.dataset.amount)
+      if (Number.isNaN(amount)) continue
+
+      const converted = (target.rate * amount).toFixed(2)
+      const note = document.createElement('span')
+      note.style.background = '#eee'
+      note.textContent = ` (~ ${converted} ${target.currency} ${target.flag})`
+      el.append(note)
+    }
+  }
+</script>

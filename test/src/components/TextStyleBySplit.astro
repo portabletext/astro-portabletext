@@ -1,0 +1,25 @@
+---
+import type { TextNode, Props as $ } from "@portabletext/astro/types";
+
+export type Props = $<TextNode>;
+
+const { node } = Astro.props;
+---
+
+{
+  node.text.split(" ").map((it, idx) =>
+    idx === 0 ? (
+      <>
+        &nbsp;<span>{it}</span>
+      </>
+    ) : (
+      it
+    )
+  )
+}
+
+<style>
+  span {
+    color: yellow;
+  }
+</style>

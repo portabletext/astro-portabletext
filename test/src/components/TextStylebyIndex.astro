@@ -1,0 +1,24 @@
+---
+import type { TextNode, Props as $ } from "@portabletext/astro/types";
+
+export type Props = $<TextNode>;
+
+const { node, index } = Astro.props;
+---
+
+{
+  index === 1 ? (
+    <>
+      &nbsp;
+      <span>{node.text.trim()}</span>
+    </>
+  ) : (
+    node.text
+  )
+}
+
+<style>
+  span {
+    color: green;
+  }
+</style>

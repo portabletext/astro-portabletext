@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": ["demo/dist/**", "test/dist/**", "coverage/**", "**/.astro/**"],
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "options": {
+    "typeAware": true,
+    "typeCheck": true,
+    "denyWarnings": true,
+    "reportUnusedDisableDirectives": "warn"
+  },
+  "rules": {
+    "no-console": "error",
+    "no-array-sort": "off",
+    "no-deprecated": "error",
+    // @TODO these rules should be enabled, and the violations fixed
+    "no-unsafe-type-assertion": "off",
+    // Portable Text uses `_type` and `_key` properties throughout
+    "no-underscore-dangle": "off"
+  },
+  "overrides": [
+    {
+      "files": ["test/**"],
+      "rules": {
+        "no-console": "off",
+        "no-unsafe-type-assertion": "off",
+        "consistent-function-scoping": "off"
+      }
+    }
+  ]
+}

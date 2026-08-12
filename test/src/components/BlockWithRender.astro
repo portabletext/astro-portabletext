@@ -1,0 +1,19 @@
+---
+import type { Block, Props as $ } from "@portabletext/astro/types";
+import { usePortableText } from "@portabletext/astro";
+
+export type Props = $<Block>;
+
+const props = Astro.props;
+const { node } = props;
+
+const { render } = usePortableText(node);
+---
+
+<div data-custom="block">
+  {
+    render({
+      text: ({ props }) => <span data-custom="text">{props.node.text} 🚀</span>,
+    })
+  }
+</div>
