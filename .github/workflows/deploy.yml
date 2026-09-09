@@ -26,6 +26,8 @@ jobs:
           node-version: lts/*
       - run: pnpm install
       - run: pnpm build:demo
+        env:
+          PAGES_DEPLOY: 'true'
       - uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
         with:
           github_token: ${{ steps.generate-token.outputs.token }}

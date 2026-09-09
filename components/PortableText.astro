@@ -121,8 +121,8 @@ const provideComponent = (
   type: string,
   fallbackComponent: Component
 ): Component => {
-  const component: Component | undefined = ((component) => {
-    return component[type as keyof typeof component] || component;
+  const component: Component | undefined = ((entry) => {
+    return entry[type as keyof typeof entry] || entry;
   })(components[nodeType]);
 
   if (isComponent(component)) {
@@ -151,7 +151,7 @@ const portableTextRender = (options: RenderOptions, isInline?: boolean) => {
     return children?.map(portableTextRender(options, inline)) ?? [];
   };
 
-  const renderOptions = { ...fallbackRenderOptions, ...(options ?? {}) };
+  const renderOptions = { ...fallbackRenderOptions, ...options };
 
   return function renderNode(node: TypedObject, index: number): any {
     function run<H extends (...args: any) => any, P = Parameters<H>[0]>(
@@ -275,6 +275,7 @@ const provideDefaultComponent = (node: TypedObject) => {
 
   // Cache missed use manual lookup
   if (import.meta.env.DEV) {
+    // oxlint-disable-next-line no-console
     console.warn(
       `[@portabletext/astro] Cache missed for default component on node type "${node._type}". Ensure you are passing in the original "node" prop.`
     );
@@ -299,6 +300,7 @@ const provideUnknownComponent = (node: TypedObject) => {
 
   // Cache missed use manual lookup
   if (import.meta.env.DEV) {
+    // oxlint-disable-next-line no-console
     console.warn(
       `[@portabletext/astro] Cache missed for unknown component on node type "${node._type}". Ensure you are passing in the original "node" prop.`
     );

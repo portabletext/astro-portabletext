@@ -1,5 +1,6 @@
 ---
 import {PortableText} from '@portabletext/astro'
+import {ListItem} from '@portabletext/astro/components'
 import type {SomePortableTextComponents} from '@portabletext/astro/types'
 
 import AnnotatedMap from '../components/AnnotatedMap.astro'
@@ -30,6 +31,9 @@ const components: SomePortableTextComponents = {
   },
   list: {
     schnauzer: SchnauzerList,
+  },
+  listItem: {
+    schnauzer: ListItem,
   },
   mark: {
     link: Link,

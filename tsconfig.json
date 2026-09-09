@@ -1,7 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": ["components", "lib", "demo/src", "test/src"],
-  "exclude": ["node_modules", "demo/dist", "test/dist"],
+  "include": ["components", "lib", "demo/src"],
+  "exclude": ["node_modules", "demo/dist", "test"],
   "compilerOptions": {
     "noUncheckedIndexedAccess": true
   }
