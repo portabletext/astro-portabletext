@@ -1,0 +1,57 @@
+---
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+
+const blocks = [
+  {
+    _type: "block",
+    markDefs: [
+      {
+        _key: "a1",
+        _type: "link",
+        href: "https://portabletext.org",
+      },
+    ],
+    children: [
+      {
+        _type: "span",
+        text: "bold",
+        marks: ["strong"],
+      },
+      {
+        _type: "span",
+        text: "link",
+        marks: ["a1"],
+      },
+      {
+        _type: "span",
+        text: "struck",
+        marks: ["strike-through"],
+      },
+    ],
+  },
+];
+---
+
+<Layout>
+  <PortableText value={blocks}>
+    <fragment slot="mark:link">
+      {
+        ({ Component, props, children }) => (
+          <Component {...props} data-slot="mark-link">
+            {children}
+          </Component>
+        )
+      }
+    </fragment>
+    <fragment slot="mark:strike-through">
+      {
+        ({ Component, props, children }) => (
+          <Component {...props} data-slot="mark-strike-through">
+            {children}
+          </Component>
+        )
+      }
+    </fragment>
+  </PortableText>
+</Layout>

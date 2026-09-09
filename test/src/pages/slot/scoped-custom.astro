@@ -1,0 +1,73 @@
+---
+import assert from "node:assert";
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+import HelloWorld from "../../components/HelloWorld.astro";
+import Mark from "../../components/Mark.astro";
+import MyBlock from "../../components/MyBlock.astro";
+
+const blocks = [
+  {
+    _type: "block",
+    style: "h1",
+    children: [
+      {
+        _type: "span",
+        text: "bold",
+        marks: ["strong"],
+      },
+    ],
+  },
+  {
+    _type: "helloWorld",
+  },
+];
+---
+
+<!-- A scoped slot receives the component that the `components` prop resolved to. -->
+<Layout>
+  <PortableText
+    value={blocks}
+    components={{
+      block: { h1: MyBlock },
+      mark: { strong: Mark },
+      type: { helloWorld: HelloWorld },
+    }}
+  >
+    <fragment slot="block:h1">
+      {
+        ({ Component, props, children }) => {
+          assert(Component === MyBlock, "Component is not MyBlock");
+
+          return (
+            <Component {...props} data-slot="block-h1">
+              {children}
+            </Component>
+          );
+        }
+      }
+    </fragment>
+    <fragment slot="mark:strong">
+      {
+        ({ Component, props, children }) => {
+          assert(Component === Mark, "Component is not Mark");
+
+          return (
+            <Component {...props} data-slot="mark-strong">
+              {children}
+            </Component>
+          );
+        }
+      }
+    </fragment>
+    <fragment slot="type:helloWorld">
+      {
+        ({ Component, props }) => {
+          assert(Component === HelloWorld, "Component is not HelloWorld");
+
+          return <Component {...props} data-slot="type-helloworld" />;
+        }
+      }
+    </fragment>
+  </PortableText>
+</Layout>

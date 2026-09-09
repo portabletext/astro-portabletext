@@ -1,0 +1,30 @@
+---
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+import BlockWithRender from "../../components/BlockWithRender.astro";
+
+const blocks = [
+  {
+    _type: "block",
+    style: "normal",
+    children: [
+      {
+        _type: "span",
+        text: "Rocket launch",
+      },
+    ],
+  },
+];
+---
+
+<!--
+  `BlockWithRender` renders its children with `render({ text })`, which appends a
+  rocket. The `text` slot belongs to the author of this `PortableText`, so it wins.
+-->
+<Layout>
+  <PortableText value={blocks} components={{ block: BlockWithRender }}>
+    <fragment slot="text">
+      {({ props }) => <span data-slot="text">{props.node.text}</span>}
+    </fragment>
+  </PortableText>
+</Layout>

@@ -1,4 +1,4 @@
 {
   "extends": "astro/tsconfigs/base",
-  "include": [".astro", "src"]
+  "include": [".astro", "src", "*.ts", "*.d.ts", "html", "unit"]
 }

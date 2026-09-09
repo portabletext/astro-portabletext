@@ -24,12 +24,20 @@ import type {
 
 import {
   isComponent,
+  isSlotName,
   mergeComponents,
   setNodeComponents,
   getNodeComponents,
+  toSlotName,
 } from "../lib/internal";
+import type { SlotNodeType } from "../lib/internal";
 
-import { getWarningMessage, printWarning } from "../lib/warnings";
+import {
+  getWarningMessage,
+  ignoredChildrenWarning,
+  printWarning,
+  unknownSlotWarning,
+} from "../lib/warnings";
 import { key as contextRef } from "../lib/context";
 
 import Block from "./Block.astro";
@@ -137,6 +145,18 @@ const provideComponent = (
   return fallbackComponent;
 };
 
+type RunArgs = {
+  nodeType: SlotNodeType;
+  /** Block style, list type, mark type or custom `_type`, when there is one */
+  type?: string;
+  // Loosely typed: each `RenderOptions` entry narrows `node` to its own type
+  handler: ((handlerProps: any) => any) | undefined;
+  /** Called only if something actually asks for the node's `Component` */
+  resolveComponent: () => Component;
+  props: ComponentProps<TypedObject>;
+  children?: unknown;
+};
+
 // The local render function will override these options
 let fallbackRenderOptions: Required<RenderOptions> | undefined;
 
@@ -154,25 +174,55 @@ const portableTextRender = (options: RenderOptions, isInline?: boolean) => {
   const renderOptions = { ...fallbackRenderOptions, ...options };
 
   return function renderNode(node: TypedObject, index: number): any {
-    function run<H extends (...args: any) => any, P = Parameters<H>[0]>(
-      handler: H | undefined,
-      props: P
-    ) {
+    function run({
+      nodeType,
+      type,
+      handler,
+      resolveComponent,
+      props,
+      children,
+    }: RunArgs) {
+      let component: Component | undefined;
+
+      const handlerProps = {
+        // Resolved lazily. A slot rendering its own markup never asks for
+        // `Component`, and so must not trigger a missing component warning.
+        get Component() {
+          return (component ??= resolveComponent());
+        },
+        props,
+        children,
+      };
+
+      // A slot always wins. `renderOptions` may have been overridden by a component
+      // from the `components` prop calling `render` from `usePortableText`, which
+      // must not take the slot away from the author of this `PortableText`.
+      const slotRenderer = provideSlot(nodeType, type);
+
+      if (slotRenderer) {
+        return slotRenderer([handlerProps]);
+      }
+
       if (!isComponent(handler)) {
         throw new Error(
           `[PortableText render] No handler found for node type ${node._type}.`
         );
       }
 
-      return handler(props);
+      return handler(handlerProps);
     }
 
     if (isPortableTextToolkitList(node)) {
+      const listType = node.listItem;
       const UnknownComponent = components.unknownList ?? UnknownList;
       setNodeComponents(node, List, UnknownComponent);
 
-      return run(renderOptions.list, {
-        Component: provideComponent("list", node.listItem, UnknownComponent),
+      return run({
+        nodeType: "list",
+        type: listType,
+        handler: renderOptions.list,
+        resolveComponent: () =>
+          provideComponent("list", listType, UnknownComponent),
         props: asComponentProps(node, index, false),
         children: renderChildren(node.children, false),
       });
@@ -189,12 +239,12 @@ const portableTextRender = (options: RenderOptions, isInline?: boolean) => {
       const UnknownComponent = components.unknownListItem ?? UnknownListItem;
       setNodeComponents(node, ListItem, UnknownComponent);
 
-      return run(renderOptions.listItem, {
-        Component: provideComponent(
-          "listItem",
-          node.listItem,
-          UnknownComponent
-        ),
+      return run({
+        nodeType: "listItem",
+        type: listItem,
+        handler: renderOptions.listItem,
+        resolveComponent: () =>
+          provideComponent("listItem", listItem, UnknownComponent),
         props: asComponentProps(node, index, false),
         children: isStyled
           ? node.children
@@ -203,11 +253,16 @@ const portableTextRender = (options: RenderOptions, isInline?: boolean) => {
     }
 
     if (isPortableTextToolkitSpan(node)) {
+      const markType = node.markType;
       const UnknownComponent = components.unknownMark ?? UnknownMark;
       setNodeComponents(node, Mark, UnknownComponent);
 
-      return run(renderOptions.mark, {
-        Component: provideComponent("mark", node.markType, UnknownComponent),
+      return run({
+        nodeType: "mark",
+        type: markType,
+        handler: renderOptions.mark,
+        resolveComponent: () =>
+          provideComponent("mark", markType, UnknownComponent),
         props: asComponentProps(node, index, true),
         children: renderChildren(node.children, true),
       });
@@ -217,11 +272,16 @@ const portableTextRender = (options: RenderOptions, isInline?: boolean) => {
       node.style ??= "normal"; /* Make sure style has been set */
       node.children = buildMarksTree(node);
 
+      const style = node.style;
       const UnknownComponent = components.unknownBlock ?? UnknownBlock;
       setNodeComponents(node, Block, UnknownComponent);
 
-      return run(renderOptions.block, {
-        Component: provideComponent("block", node.style, UnknownComponent),
+      return run({
+        nodeType: "block",
+        type: style,
+        handler: renderOptions.block,
+        resolveComponent: () =>
+          provideComponent("block", style, UnknownComponent),
         props: asComponentProps(node, index, false),
         children: renderChildren(node.children, true),
       });
@@ -232,25 +292,36 @@ const portableTextRender = (options: RenderOptions, isInline?: boolean) => {
       const props = asComponentProps(node, index, true);
 
       if (isHardBreak) {
-        return run(renderOptions.hardBreak, {
-          Component: isComponent(components.hardBreak)
-            ? components.hardBreak
-            : HardBreak,
+        return run({
+          nodeType: "hardBreak",
+          handler: renderOptions.hardBreak,
+          resolveComponent: () =>
+            isComponent(components.hardBreak)
+              ? components.hardBreak
+              : HardBreak,
           props,
         });
       }
 
-      return run(renderOptions.text, {
-        Component: isComponent(components.text) ? components.text : Text,
+      return run({
+        nodeType: "text",
+        handler: renderOptions.text,
+        resolveComponent: () =>
+          isComponent(components.text) ? components.text : Text,
         props,
       });
     }
 
     // Custom type
+    const customType = node._type;
     const UnknownComponent = components.unknownType ?? UnknownType;
 
-    return run(renderOptions.type, {
-      Component: provideComponent("type", node._type, UnknownComponent),
+    return run({
+      nodeType: "type",
+      type: customType,
+      handler: renderOptions.type,
+      resolveComponent: () =>
+        provideComponent("type", customType, UnknownComponent),
       props: asComponentProps(
         node,
         index,
@@ -346,47 +417,66 @@ const createSlotRenderer = (slotName: string) =>
 
 type SlotRenderer = ReturnType<typeof createSlotRenderer>;
 
-const slots = [
-  "type",
-  "block",
-  "list",
-  "listItem",
-  "mark",
-  "text",
-  "hardBreak",
-].reduce(
-  (obj, name) => {
-    obj[name] = Astro.slots.has(name) ? createSlotRenderer(name) : undefined;
-    return obj;
-  },
-  {} as Record<string, SlotRenderer | undefined>
-);
+const slotRenderers = new Map<string, SlotRenderer | undefined>();
 
+const provideSlotRenderer = (slotName: string): SlotRenderer | undefined => {
+  if (!slotRenderers.has(slotName)) {
+    slotRenderers.set(
+      slotName,
+      Astro.slots.has(slotName) ? createSlotRenderer(slotName) : undefined
+    );
+  }
+
+  return slotRenderers.get(slotName);
+};
+
+/**
+ * Resolves the slot to render a node with.
+ * A slot scoped to a type, e.g. `block:h1`, takes precedence over `block`.
+ */
+const provideSlot = (
+  nodeType: SlotNodeType,
+  type?: string
+): SlotRenderer | undefined =>
+  (type ? provideSlotRenderer(toSlotName(nodeType, type)) : undefined) ??
+  provideSlotRenderer(nodeType);
+
+// A slot targeting an unrecognised node type never renders, so let the author
+// know rather than silently ignoring it.
+if (import.meta.env.DEV) {
+  for (const slotName of Object.keys(Astro.slots)) {
+    if (isSlotName(slotName)) continue;
+
+    printWarning(
+      "default" === slotName
+        ? ignoredChildrenWarning()
+        : unknownSlotWarning(slotName)
+    );
+  }
+}
+
+// Slots are resolved by `portableTextRender`, so every node type falls back to
+// simply rendering its resolved component.
 type RenderNode = (
-  slotRenderer: SlotRenderer | undefined
-) => (
   props: Parameters<NonNullable<RenderOptions[keyof RenderOptions]>>[0]
 ) => any;
 ---
 
 {
   (() => {
-    const renderNode: RenderNode = (slotRenderer) => {
-      return ({ Component, props, children }) =>
-        slotRenderer?.([{ Component, props, children }]) ?? (
-          <Component {...(props as any)}>{children}</Component>
-        );
-    };
+    const renderNode: RenderNode = ({ Component, props, children }) => (
+      <Component {...(props as any)}>{children}</Component>
+    );
 
     return nodes.map(
       render({
-        type: renderNode(slots.type),
-        block: renderNode(slots.block),
-        list: renderNode(slots.list),
-        listItem: renderNode(slots.listItem),
-        mark: renderNode(slots.mark),
-        text: renderNode(slots.text),
-        hardBreak: renderNode(slots.hardBreak),
+        type: renderNode,
+        block: renderNode,
+        list: renderNode,
+        listItem: renderNode,
+        mark: renderNode,
+        text: renderNode,
+        hardBreak: renderNode,
       })
     );
   })()

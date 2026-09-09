@@ -1,4 +1,10 @@
-import type {Component, ComponentOrRecord, SomePortableTextComponents, TypedObject} from './types'
+import type {
+  Component,
+  ComponentOrRecord,
+  NodeType,
+  SomePortableTextComponents,
+  TypedObject,
+} from './types'
 
 /**
  * Helper for component to throw an error
@@ -60,6 +66,80 @@ export function mergeComponents<
           : (Overrides & Components)[Key]
       : (Overrides & Components)[Key]
   }
+}
+
+/**
+ * =====
+ * Slots
+ * =====
+ */
+
+/**
+ * A node type that a `PortableText` slot can target. `text` and `hardBreak` have
+ * no types of their own, so they round out the scopeable `NodeType`s.
+ * @internal
+ */
+export type SlotNodeType = NodeType | 'text' | 'hardBreak'
+
+/**
+ * Node types that a `PortableText` slot can target, mapped to whether the slot
+ * name can be scoped to a specific type, e.g. `block:h1`.
+ * @internal
+ *
+ * @remarks
+ * `satisfies` keeps this map exhaustive - adding a `NodeType` will not compile
+ * until it is given an entry here.
+ */
+const slotNodeTypes = {
+  type: true,
+  block: true,
+  list: true,
+  listItem: true,
+  mark: true,
+  text: false,
+  hardBreak: false,
+} as const satisfies Record<SlotNodeType, boolean>
+
+/**
+ * The node types that a `PortableText` slot can target.
+ * @internal
+ */
+export const slotNames: readonly SlotNodeType[] = Object.keys(slotNodeTypes) as SlotNodeType[]
+
+/**
+ * Builds the name of the slot that renders the given node type, optionally
+ * scoped to a specific `type` such as a block style or a mark type.
+ * @internal
+ */
+export function toSlotName(nodeType: string, type?: string): string {
+  return type ? `${nodeType}:${type}` : nodeType
+}
+
+/**
+ * Returns true if `slotName` targets a node type that is rendered by `PortableText`.
+ * @internal
+ *
+ * @remarks
+ * The scope of a scoped slot name, e.g. the `h1` of `block:h1`, cannot be verified
+ * upfront as block styles, mark types and custom types are user defined.
+ */
+export function isSlotName(slotName: string): boolean {
+  const separator = slotName.indexOf(':')
+
+  // `Object.hasOwn` rather than `in`, so inherited keys such as `toString` and
+  // `constructor` are not mistaken for node types.
+  if (separator === -1) {
+    return Object.hasOwn(slotNodeTypes, slotName)
+  }
+
+  const nodeType = slotName.slice(0, separator)
+  const scope = slotName.slice(separator + 1)
+
+  return (
+    Object.hasOwn(slotNodeTypes, nodeType) &&
+    slotNodeTypes[nodeType as SlotNodeType] &&
+    scope.length > 0
+  )
 }
 
 /**

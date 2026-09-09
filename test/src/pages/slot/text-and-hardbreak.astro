@@ -1,0 +1,48 @@
+---
+import assert from "node:assert";
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+// `Text` and `HardBreak` are not re-exported by `@portabletext/astro/components`
+import DefaultHardBreak from "../../../../components/HardBreak.astro";
+import DefaultText from "../../../../components/Text.astro";
+
+// `buildMarksTree` splits the span on "\n", so this yields text, hardBreak, text.
+const blocks = [
+  {
+    _type: "block",
+    style: "normal",
+    children: [
+      {
+        _type: "span",
+        text: "line one\nline two",
+      },
+    ],
+  },
+];
+---
+
+<Layout>
+  <PortableText value={blocks}>
+    <fragment slot="text">
+      {
+        ({ Component, props }) => {
+          assert(Component === DefaultText, "Component is not DefaultText");
+
+          return <span data-slot="text">{props.node.text}</span>;
+        }
+      }
+    </fragment>
+    <fragment slot="hardBreak">
+      {
+        ({ Component }) => {
+          assert(
+            Component === DefaultHardBreak,
+            "Component is not DefaultHardBreak"
+          );
+
+          return <hr data-slot="hardbreak" />;
+        }
+      }
+    </fragment>
+  </PortableText>
+</Layout>
