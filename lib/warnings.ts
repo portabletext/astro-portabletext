@@ -1,3 +1,4 @@
+import {slotNames} from './internal'
 import type {NodeType} from './types'
 
 const getTemplate = (prop: string, type: string): string =>
@@ -13,6 +14,15 @@ export const unknownListWarning = (listItem: string): string => getTemplate('lis
 
 export const unknownListItemWarning = (listStyle: string): string =>
   getTemplate('listItem', listStyle)
+
+export const unknownSlotWarning = (slotName: string): string =>
+  `PortableText slot "${slotName}" does not target a node type and will be ignored. ` +
+  `Expected ${slotNames.map((it) => `"${it}"`).join(', ')}, ` +
+  `optionally scoped to a type, e.g. "block:h1"`
+
+export const ignoredChildrenWarning = (): string =>
+  'PortableText was given children that are not assigned to a slot, so they will be ignored. ' +
+  'Assign them to a node type, e.g. <fragment slot="block">'
 
 export const getWarningMessage = (nodeType: NodeType, type: string) => {
   const fncs = {

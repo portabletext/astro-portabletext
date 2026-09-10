@@ -1,0 +1,50 @@
+---
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+
+const blocks = [
+  {
+    _type: "block",
+    style: "h1",
+    children: [
+      {
+        _type: "span",
+        text: "I'm a heading",
+      },
+    ],
+  },
+  {
+    _type: "block",
+    style: "blockquote",
+    children: [
+      {
+        _type: "span",
+        text: "I'm a quote",
+      },
+    ],
+  },
+];
+---
+
+<Layout>
+  <PortableText value={blocks}>
+    <fragment slot="block">
+      {
+        ({ Component, props, children }) => (
+          <Component {...props} data-slot="block-any">
+            {children}
+          </Component>
+        )
+      }
+    </fragment>
+    <fragment slot="block:h1">
+      {
+        ({ Component, props, children }) => (
+          <Component {...props} data-slot="block-h1">
+            {children}
+          </Component>
+        )
+      }
+    </fragment>
+  </PortableText>
+</Layout>

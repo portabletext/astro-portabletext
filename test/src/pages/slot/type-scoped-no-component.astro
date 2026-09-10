@@ -1,0 +1,21 @@
+---
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+
+// `components.type` has no defaults, so `callout` is unregistered on purpose -
+// the scoped slot renders it on its own.
+const blocks = [
+  {
+    _type: "callout",
+    text: "Heads up",
+  },
+];
+---
+
+<Layout>
+  <PortableText value={blocks}>
+    <fragment slot="type:callout">
+      {({ props }) => <aside class="callout">{props.node.text}</aside>}
+    </fragment>
+  </PortableText>
+</Layout>

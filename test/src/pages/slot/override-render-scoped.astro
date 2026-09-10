@@ -1,0 +1,42 @@
+---
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+import BlockWithMarkRender from "../../components/BlockWithMarkRender.astro";
+
+const blocks = [
+  {
+    _type: "block",
+    style: "normal",
+    children: [
+      {
+        _type: "span",
+        text: "emphasis",
+        marks: ["em"],
+      },
+      {
+        _type: "span",
+        text: "bold",
+        marks: ["strong"],
+      },
+    ],
+  },
+];
+---
+
+<!--
+  `BlockWithMarkRender` renders every mark with `render({ mark })`. The `mark:em`
+  slot wins for `em`, while `strong` is left to the component's own renderer.
+-->
+<Layout>
+  <PortableText value={blocks} components={{ block: BlockWithMarkRender }}>
+    <fragment slot="mark:em">
+      {
+        ({ Component, props, children }) => (
+          <Component {...props} data-slot="mark-em">
+            {children}
+          </Component>
+        )
+      }
+    </fragment>
+  </PortableText>
+</Layout>

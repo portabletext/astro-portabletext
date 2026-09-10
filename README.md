@@ -7,11 +7,7 @@
 Render [Portable Text](https://portabletext.org) with [Astro](https://astro.build).
 
 > [!NOTE]
-> This package is a fork of [`astro-portabletext`](https://github.com/theisel/astro-portabletext)
-> by [Tom Theisel](https://github.com/theisel), maintained under the
-> [`@portabletext`](https://github.com/portabletext) organization. All credit for the original
-> design and implementation goes to Tom. It remains distributed under the original
-> [ISC License](./LICENSE). See [Migrating from `astro-portabletext`](#migrating-from-astro-portabletext).
+> This package is a fork of [`astro-portabletext`](https://github.com/theisel/astro-portabletext) by [Tom Theisel](https://github.com/theisel), maintained under the [`@portabletext`](https://github.com/portabletext) organization. All credit for the original design and implementation goes to Tom. It remains distributed under the original [ISC License](./LICENSE). See [Migrating from `astro-portabletext`](#migrating-from-astro-portabletext).
 
 ## Table of contents
 
@@ -40,8 +36,7 @@ npm install @portabletext/astro
 
 ## Basic usage
 
-Import the `PortableText` component and pass it a Portable Text value. The library provides sensible
-defaults for rendering all standard Portable Text elements, which you can override.
+Import the `PortableText` component and pass it a Portable Text value. The library provides sensible defaults for rendering all standard Portable Text elements, which you can override.
 
 ```astro
 ---
@@ -66,9 +61,7 @@ const portableText = [
 
 ## Sanity integration
 
-This library's predecessor is
-[officially recommended](https://www.sanity.io/plugins/sanity-astro#rendering-rich-text-and-block-content-with-portable-text)
-by [Sanity](https://sanity.io) for rendering Portable Text in Astro projects. Helpful resources:
+This library's predecessor is [officially recommended](https://www.sanity.io/plugins/sanity-astro#rendering-rich-text-and-block-content-with-portable-text) by [Sanity](https://sanity.io) for rendering Portable Text in Astro projects. Helpful resources:
 
 - [Sanity integration for Astro](https://www.sanity.io/plugins/sanity-astro)
 - [Guide: building a blog with Sanity and Astro](https://www.sanity.io/guides/sanity-astro-blog)
@@ -77,9 +70,7 @@ by [Sanity](https://sanity.io) for rendering Portable Text in Astro projects. He
 
 ### Default components
 
-Default components are provided for all standard features of the Portable Text spec, with logical
-HTML defaults. Provided components are merged with the defaults, so you only need to provide the
-things you want to override.
+Default components are provided for all standard features of the Portable Text spec, with logical HTML defaults. Provided components are merged with the defaults, so you only need to provide the things you want to override.
 
 <details>
   <summary>View the default structure and output</summary>
@@ -126,8 +117,7 @@ things you want to override.
 
 ### Custom components
 
-Custom components give you control over how each node is rendered. Map a component to a whole node
-type, or to a specific property (style, mark type, list item type, etc.) of that node type.
+Custom components give you control over how each node is rendered. Map a component to a whole node type, or to a specific property (style, mark type, list item type, etc.) of that node type.
 
 ```astro
 ---
@@ -165,8 +155,7 @@ const components = {
 <PortableText value={portableText} components={components} />
 ```
 
-Each custom component receives `node`, `index` and `isInline` props, and renders any children
-through a `<slot />`. For example, a custom `link` mark:
+Each custom component receives `node`, `index` and `isInline` props, and renders any children through a `<slot />`. For example, a custom `link` mark:
 
 ```astro
 ---
@@ -183,9 +172,7 @@ const href = node.markDef?.href
 
 ### Slots
 
-Slots provide a flexible way to enhance rendering by passing additional props to the resolved
-component - for example applying custom classes or wrapping elements - without replacing the default
-component entirely.
+Slots provide a flexible way to enhance rendering by passing additional props to the resolved component - for example applying custom classes or wrapping elements - without replacing the default component entirely.
 
 ```astro
 ---
@@ -211,6 +198,86 @@ const portableText = [
 </style>
 ```
 
+A slot named after a node type applies to every node of that type: `type`, `block`, `list`, `listItem`, `mark`, `text` and `hardBreak`. To target a single block style, list type, mark type or custom type, scope the slot name with `nodeType:type`.
+
+```astro
+<PortableText value={portableText}>
+  <fragment slot="block:h1">
+    {({Component, props, children}) => (
+      <Component {...props} class="heading">{children}</Component>
+    )}
+  </fragment>
+  <fragment slot="mark:link">
+    {({Component, props, children}) => (
+      <Component {...props} rel="noopener">{children}</Component>
+    )}
+  </fragment>
+  <fragment slot="type:callout">
+    {({props}) => <aside class="callout">{props.node.text}</aside>}
+  </fragment>
+</PortableText>
+```
+
+A slot only has a `Component` to render when the node type has one. Standard block styles, list types and mark types all ship defaults, but `components.type` starts out empty - a custom type has no default component. So a slot for a custom type either renders its own markup, as `type:callout` does above, or registers a component to receive:
+
+```astro
+<PortableText value={portableText} components={{type: {callout: Callout}}}>
+  <fragment slot="type:callout">
+    {({Component, props}) => <Component {...props} class="callout" />}
+  </fragment>
+</PortableText>
+```
+
+Asking for `Component` when the node type has none gives you the unknown-type component and reports the missing component through [`onMissingComponent`](#portabletext-component-properties). A slot that never touches `Component` renders cleanly.
+
+A scoped slot takes precedence over the node type it belongs to, so `block` can handle every block while `block:h1` handles headings.
+
+```astro
+<PortableText value={portableText}>
+  <!-- Every block except `h1` -->
+  <fragment slot="block">
+    {({Component, props, children}) => (
+      <Component {...props} class="block">{children}</Component>
+    )}
+  </fragment>
+  <fragment slot="block:h1">
+    {({Component, props, children}) => (
+      <Component {...props} class="heading">{children}</Component>
+    )}
+  </fragment>
+</PortableText>
+```
+
+The `text` and `hardBreak` node types have no types of their own, so they cannot be scoped.
+
+#### Slots and the `components` prop
+
+A slot does not replace the [`components`](#customizing-components) prop, it wraps it. The `Component` handed to a slot is whatever the `components` prop resolved to for that node, so the two compose - the slot decides how the resolved component is rendered.
+
+```astro
+<PortableText value={portableText} components={{block: {h1: MyHeading}}}>
+  <fragment slot="block:h1">
+    <!-- `Component` is `MyHeading` -->
+    {({Component, props, children}) => (
+      <Component {...props} class="heading">{children}</Component>
+    )}
+  </fragment>
+</PortableText>
+```
+
+Slots belong to the author of the `PortableText` element, so they always win. A component reached through the `components` prop can customize its own children with [`render`](#useportabletext), but a slot for that node type takes precedence over it.
+
+```astro
+<PortableText value={portableText} components={{block: MyBlock}}>
+  <!-- Applies even if `MyBlock` renders its children with `render({mark: ...})` -->
+  <fragment slot="mark">
+    {({Component, props, children}) => (
+      <Component {...props} class="mark">{children}</Component>
+    )}
+  </fragment>
+</PortableText>
+```
+
 ## `PortableText` component properties
 
 | Property                        | Type                    | Description                                                                                                                                 |
@@ -228,8 +295,7 @@ import {usePortableText, mergeComponents, toPlainText, spanToPlainText} from '@p
 
 ### `usePortableText`
 
-Within a component passed into the `components` prop, `usePortableText(node)` returns rendering
-utilities scoped to that node: `getDefaultComponent()`, `getUnknownComponent()` and `render()`.
+Within a component passed into the `components` prop, `usePortableText(node)` returns rendering utilities scoped to that node: `getDefaultComponent()`, `getUnknownComponent()` and `render()`.
 
 ```astro
 ---
@@ -248,8 +314,7 @@ const Default = getDefaultComponent()
 
 ### `mergeComponents`
 
-Merges two component maps, giving priority to the overrides. Useful for extending a shared base set
-of components.
+Merges two component maps, giving priority to the overrides. Useful for extending a shared base set of components.
 
 ```js
 import {mergeComponents} from '@portabletext/astro'
@@ -261,8 +326,7 @@ const components = mergeComponents(baseComponents, {
 
 ### `toPlainText`
 
-Renders one or more Portable Text blocks as a plain string - handy for meta descriptions or
-generating slugs. `spanToPlainText` does the same for a single span's children.
+Renders one or more Portable Text blocks as a plain string - handy for meta descriptions or generating slugs. `spanToPlainText` does the same for a single span's children.
 
 ```astro
 ---
@@ -275,8 +339,7 @@ const text = toPlainText(node)
 
 ## Migrating from `astro-portabletext`
 
-`@portabletext/astro` is a drop-in fork of [`astro-portabletext`](https://github.com/theisel/astro-portabletext).
-To migrate, swap the dependency and update your imports:
+`@portabletext/astro` is a drop-in fork of [`astro-portabletext`](https://github.com/theisel/astro-portabletext). To migrate, swap the dependency and update your imports:
 
 ```diff
 - import {PortableText} from 'astro-portabletext'

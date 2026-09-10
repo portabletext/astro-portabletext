@@ -1,0 +1,29 @@
+---
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+import HelloWorld from "../../components/HelloWorld.astro";
+
+const blocks = [
+  {
+    _type: "helloWorld",
+  },
+  {
+    _type: "goodbyeWorld",
+  },
+];
+---
+
+<Layout>
+  <PortableText
+    value={blocks}
+    components={{ type: { helloWorld: HelloWorld, goodbyeWorld: HelloWorld } }}
+  >
+    <fragment slot="type:helloWorld">
+      {
+        ({ Component, props }) => (
+          <Component {...props} data-slot="type-helloworld" />
+        )
+      }
+    </fragment>
+  </PortableText>
+</Layout>

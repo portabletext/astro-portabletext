@@ -1,0 +1,50 @@
+---
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+
+const blocks = [
+  {
+    _type: "block",
+    listItem: "bullet",
+    children: [
+      {
+        _type: "span",
+        text: "Bullet Item",
+      },
+    ],
+  },
+  {
+    _type: "block",
+    listItem: "number",
+    children: [
+      {
+        _type: "span",
+        text: "Number Item",
+      },
+    ],
+  },
+];
+---
+
+<Layout>
+  <PortableText value={blocks}>
+    <fragment slot="list:bullet">
+      {
+        ({ Component, props, children }) => (
+          <Component {...props} data-slot="list-bullet">
+            {children}
+          </Component>
+        )
+      }
+    </fragment>
+    <fragment slot="listItem:number">
+      {
+        ({ Component, props, children }) => (
+          <Component {...props} data-slot="listitem-number">
+            {children}
+          </Component>
+        )
+      }
+    </fragment>
+  </PortableText>
+</Layout>
