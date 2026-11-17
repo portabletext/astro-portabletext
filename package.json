@@ -72,9 +72,9 @@
     "cheerio": "^1.2.0",
     "leaflet": "^1.9.4",
     "oxfmt": "^0.63.0",
-    "oxlint": "^1.78.0",
-    "oxlint-tsgolint": "^7.0.2001",
+    "oxlint": "^1.94.0",
     "rimraf": "^5.0.1",
+    "tsrs": "0.25.0-ts7.1.0-beta",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   },
