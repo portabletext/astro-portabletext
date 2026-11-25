@@ -3,6 +3,5 @@
   "changelog": ["@changesets/changelog-github", {"repo": "portabletext/astro-portabletext"}],
   "commit": false,
   "access": "public",
-  "baseBranch": "main",
   "updateInternalDependencies": "patch"
 }

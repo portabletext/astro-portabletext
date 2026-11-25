@@ -1,0 +1,17 @@
+---
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+
+const hrefs = [123, { toString: "javascript:alert(1)" }, null, true];
+
+const blocks = hrefs.map((href, i) => ({
+  _type: "block",
+  _key: `block-${i}`,
+  children: [{ _type: "span", text: `link-${i}`, marks: ["link-key"] }],
+  markDefs: [{ _key: "link-key", _type: "link", href }],
+}));
+---
+
+<Layout>
+  <PortableText value={blocks} />
+</Layout>
