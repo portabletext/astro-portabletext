@@ -59,7 +59,7 @@
     "type-check": "astro check"
   },
   "dependencies": {
-    "@portabletext/toolkit": "^6.0.0",
+    "@portabletext/toolkit": "^6.1.1",
     "@portabletext/types": "^4.0.2"
   },
   "devDependencies": {
