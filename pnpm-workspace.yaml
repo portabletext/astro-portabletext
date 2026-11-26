@@ -1,0 +1,11 @@
+minimumReleaseAgeExclude:
+  - '@portabletext/toolkit@6.1.1'
+  - '@portabletext/types@4.0.3'
+  - '@types/node@26.6.11'
+  - 'oxlint-tsgolint@7.0.2009'
+  - '@oxlint-tsgolint/darwin-arm64@7.0.2009'
+  - '@oxlint-tsgolint/darwin-x64@7.0.2009'
+  - '@oxlint-tsgolint/linux-arm64@7.0.2009'
+  - '@oxlint-tsgolint/linux-x64@7.0.2009'
+  - '@oxlint-tsgolint/win32-arm64@7.0.2009'
+  - '@oxlint-tsgolint/win32-x64@7.0.2009'

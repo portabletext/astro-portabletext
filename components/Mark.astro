@@ -1,5 +1,6 @@
 ---
 import type { Mark, Props as $ } from "../lib/types";
+import { uriLooksSafe } from "@portabletext/toolkit";
 import { usePortableText } from "../lib/utils";
 
 export type Props = $<Mark>;
@@ -11,6 +12,11 @@ const markTypeIs = (markType: string) => markType === node.markType;
 const { getUnknownComponent } = usePortableText(node);
 
 const UnknownMarkType = getUnknownComponent();
+
+const markDefHref = markTypeIs("link")
+  ? (node as unknown as Mark<{ href?: unknown }>).markDef.href
+  : undefined;
+const href = typeof markDefHref === "string" ? markDefHref : undefined;
 ---
 
 {
@@ -19,7 +25,11 @@ const UnknownMarkType = getUnknownComponent();
   ) : markTypeIs("em") ? (
     <em {...attrs}><slot /></em>
   ) : markTypeIs("link") ? (
-    <a href={(node as unknown as Mark<{ href: string }>).markDef.href} {...attrs}><slot /></a>
+    uriLooksSafe(href ?? "") ? (
+      <a href={href} {...attrs}><slot /></a>
+    ) : (
+      <slot />
+    )
   ) : markTypeIs("strike-through") ? (
     <del {...attrs}><slot /></del>
   ) : markTypeIs("strong") ? (

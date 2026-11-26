@@ -1,0 +1,40 @@
+---
+import Layout from "../../layouts/Default.astro";
+import { PortableText } from "@portabletext/astro";
+
+const hrefs = [
+  "javascript:alert(1)",
+  "JAVASCRIPT:alert(1)",
+  "JaVaScRiPt:alert(1)",
+  "  javascript:alert(1)",
+  "\tjavascript:alert(1)\n",
+  "java\nscript:alert(1)",
+  "java\tscript:alert(1)",
+  "%6Aavascript:alert(1)",
+  "data:text/html,<script>alert(1)</script>",
+  "vbscript:msgbox(1)",
+  "https://test.com/",
+  "HTTPS://test.com/",
+  "http://test.com/",
+  "mailto:test@test.com",
+  "tel:+123456789",
+  "/relative/path",
+  "relative/path",
+  "../relative/path",
+  "#fragment",
+  "/search?q=javascript:alert(1)",
+  "page#javascript:alert(1)",
+  "&#106;avascript:alert(1)",
+];
+
+const blocks = hrefs.map((href, i) => ({
+  _type: "block",
+  _key: `block-${i}`,
+  children: [{ _type: "span", text: `link-${i}`, marks: ["link-key"] }],
+  markDefs: [{ _key: "link-key", _type: "link", href }],
+}));
+---
+
+<Layout>
+  <PortableText value={blocks} />
+</Layout>

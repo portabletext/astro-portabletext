@@ -59,24 +59,24 @@
     "type-check": "astro check"
   },
   "dependencies": {
-    "@portabletext/toolkit": "^6.0.0",
-    "@portabletext/types": "^4.0.2"
+    "@portabletext/toolkit": "^6.1.0",
+    "@portabletext/types": "^4.0.3"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
-    "@changesets/changelog-github": "^0.7.0",
-    "@changesets/cli": "^2.31.1",
-    "@types/leaflet": "^1.9.21",
-    "@types/node": "^26.2.0",
-    "astro": "^7.2.1",
+    "@astrojs/check": "^0.9.12",
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "@types/leaflet": "^1.9.23",
+    "@types/node": "^26.6.11",
+    "astro": "^7.4.13",
     "cheerio": "^1.2.0",
     "leaflet": "^1.9.4",
-    "oxfmt": "^0.63.0",
-    "oxlint": "^1.78.0",
-    "oxlint-tsgolint": "^7.0.2001",
-    "rimraf": "^5.0.1",
+    "oxfmt": "^0.80.0",
+    "oxlint": "^1.95.0",
+    "oxlint-tsgolint": "^7.0.2009",
+    "rimraf": "^6.1.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.10"
+    "vitest": "^5.1.2"
   },
   "peerDependencies": {
     "astro": ">=4.6.0"
@@ -89,11 +89,5 @@
   "engines": {
     "node": ">=22.12"
   },
-  "packageManager": "pnpm@10.33.3",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "sharp"
-    ]
-  }
+  "packageManager": "pnpm@12.23.0"
 }
